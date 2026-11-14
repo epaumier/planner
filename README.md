@@ -22,6 +22,11 @@ No build step, no dependencies. Either:
 ## Features
 
 - Editable grid: double-click or Enter to edit, arrows/Tab to move, Esc to cancel
+  (Alt+Enter inserts a line break inside a cell; line breaks are preserved and
+  wrap, they are never stripped)
+- Resizable columns and rows: drag a header edge to resize, double-click an edge
+  to auto-fit (auto-fit measures the longest line, so multi-line cells size
+  correctly); sizes are saved with the workbook
 - Multiple sheets (tabs at the bottom), add / rename / delete sheets
 - Insert / delete rows and columns
 - Bold, text color, cell fill (applied to the selection; Shift-click or click a
