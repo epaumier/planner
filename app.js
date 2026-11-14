@@ -716,6 +716,8 @@ document.getElementById("btn-bold").addEventListener("click", () => {
 
 document.getElementById("inp-color").addEventListener("input", (e) => applyToSel({ color: e.target.value }));
 document.getElementById("inp-bg").addEventListener("input", (e) => applyToSel({ bg: e.target.value }));
+document.getElementById("btn-apply-color").addEventListener("click", () => applyToSel({ color: document.getElementById("inp-color").value }));
+document.getElementById("btn-apply-bg").addEventListener("click", () => applyToSel({ bg: document.getElementById("inp-bg").value }));
 
 document.getElementById("btn-add-row").addEventListener("click", () => { insertRow(sheet(), state.sel.r1); save(); render(); });
 document.getElementById("btn-del-row").addEventListener("click", () => { const s = sheet(); if (s.rows > 1) { deleteRow(s, state.sel.r1); save(); render(); } });

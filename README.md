@@ -30,7 +30,9 @@ No build step, no dependencies. Either:
 - Multiple sheets (tabs at the bottom), add / rename / delete sheets
 - Insert / delete rows and columns
 - Bold, text color, cell fill (applied to the selection; Shift-click or click a
-  row/column header to select a range)
+  row/column header to select a range). The color pickers apply on change; use the
+  **Apply text** / **Apply fill** buttons to re-apply the same color again (the
+  picker does not fire when the value is unchanged)
 - Formula bar; formulas like `=A1+B2`, `=SUM(A1:B5)`, `=AVG()`, `=MIN()`, `=MAX()`
 - Autosaves to browser localStorage
 - Import/export: CSV (replaces the active sheet) and JSON (whole workbook)
