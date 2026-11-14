@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paumenchon</title>
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2l5 7h-3l4 6h-4l4 6H6l4-6H6l4-6H7z" fill="%2334d399"/><rect x="10.75" y="21" width="2.5" height="2.5" fill="%23b45309"/></svg>'>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header id="topbar">
+  <div class="brand">
+    <svg class="logo" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 2l5 7h-3l4 6h-4l4 6H6l4-6H6l4-6H7z" fill="#34d399"/><rect x="10.75" y="21" width="2.5" height="2.5" rx="0.5" fill="#b45309"/></svg>
+    Paumenchon
+  </div>
+  <nav id="app-switcher">
+    <button class="app-pill active" data-app="planner">Planner</button>
+    <button class="app-pill" data-app="trips">Trips</button>
+    <button class="app-pill" data-app="gifts">Christmas gifts</button>
+    <button class="app-pill" data-app="todos">To-do</button>
+  </nav>
+</header>
+
+<main id="app-root">
+  <section id="app-planner">
+    <div id="toolbar">
+      <button id="btn-bold" title="Bold"><b>B</b></button>
+      <label class="color-label">Text <input type="color" id="inp-color" value="#000000"></label>
+      <label class="color-label">Fill <input type="color" id="inp-bg" value="#ffd666"></label>
+      <span class="sep"></span>
+      <button id="btn-add-col" title="Insert column left of selection">+ Col</button>
+      <button id="btn-del-col" title="Delete selected column">− Col</button>
+      <button id="btn-add-row" title="Insert row above selection">+ Row</button>
+      <button id="btn-del-row" title="Delete selected row">− Row</button>
+      <span class="sep"></span>
+      <button id="btn-new-sheet">+ Sheet</button>
+      <button id="btn-rename-sheet">Rename</button>
+      <button id="btn-del-sheet">Delete sheet</button>
+      <span class="sep"></span>
+      <button id="btn-import" title="Import a .csv (active sheet) or .json (whole workbook)">Import CSV/JSON</button>
+      <button id="btn-export-csv">Export CSV</button>
+      <button id="btn-export-json">Export JSON</button>
+      <button id="btn-reset" title="Replace saved data with the demo workbook">Reset demo</button>
+    </div>
+    <div id="formula-bar">
+      <span id="cell-ref">A1</span>
+      <input id="formula-input" spellcheck="false" placeholder="Cell contents (start with = for a formula)">
+    </div>
+    <div id="grid-wrap">
+      <table id="grid" aria-label="Spreadsheet grid"></table>
+    </div>
+    <div id="statusbar">Autosaves in this browser · Export JSON / CSV to move data between your devices · formulas: =A1+B2, =SUM(A1:B5), =AVG(), =MIN(), =MAX()</div>
+    <div id="sheet-tabs"></div>
+  </section>
+
+  <section id="app-placeholder" hidden>
+    <h2 id="placeholder-title"></h2>
+    <p>This slot is reserved for one of your other planning apps (trips, Christmas gifts, to-do lists…).<br>
+    The planner grid can be embedded here later, or each app can have its own view.</p>
+  </section>
+</main>
+
+<input type="file" id="file-input" accept=".csv,.json" hidden>
+<script src="seed-calendar.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
