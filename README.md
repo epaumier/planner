@@ -1,4 +1,4 @@
-# planner
+# Paumenchon
 
 A small web spreadsheet that mimics the basics of Google Sheets, built as the first
 of several planning apps (planner, trips, Christmas gifts, to-do lists) selectable
