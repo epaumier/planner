@@ -5,12 +5,15 @@ of several planning apps (planner, trips, Christmas gifts, to-do lists) selectab
 from the top bar.
 
 The default workbook mirrors the structure of the shared family calendar Google
-Sheet: one sheet per year, months laid out in blocks of 9 columns side by side
-(2 per band), each block = [day][weekday][one column per family member]
-[Événements][Info supp][spacer], with day rows 1–31 and weekday letters
-pre-filled for the correct year. The member columns are labeled `Membre 1`–`Membre 4`
-(placeholders, since this repo is public) — rename them to your names by editing
-the header cells. Regenerate the seed with `python3 tools/make_seed.py`.
+Sheet: one sheet per year (2026, 2027), months laid out in blocks of 9 columns
+side by side (2 per band), each block = [day][weekday][one column per family
+member][Événements][Info supp][spacer], with day rows 1–31 and weekday letters
+pre-filled for the correct year. Member names come from the `PERSONS` list in
+`tools/make_seed.py` and are identical on every year sheet, so 2027 already has
+the same names as 2026. Month header rows have a yellow background, and day rows
+alternate a slightly different background within each month block (zebra striping,
+stored as `zebraColor`/`zebraPeriod` on the sheet — an explicit cell fill always
+wins over the stripe). Regenerate the seed with `python3 tools/make_seed.py`.
 
 ## Run it
 

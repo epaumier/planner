@@ -304,6 +304,16 @@ function makeTh(text, cls) {
   return el;
 }
 
+function cellBg(s, r, c) {
+  const cell = cellAt(s, r, c);
+  if (cell && cell.bg) return cell.bg;
+  if (s.zebraPeriod) {
+    const p = r % s.zebraPeriod;
+    if (p >= 1 && p % 2 === 0) return s.zebraColor;
+  }
+  return null;
+}
+
 function renderCell(s, r, c) {
   const td = document.createElement("td");
   td.dataset.r = r;
@@ -312,8 +322,9 @@ function renderCell(s, r, c) {
   if (cell) {
     if (cell.b) td.style.fontWeight = "bold";
     if (cell.color) td.style.color = cell.color;
-    if (cell.bg) td.style.backgroundColor = cell.bg;
   }
+  const bg = cellBg(s, r, c);
+  if (bg) td.style.backgroundColor = bg;
   td.textContent = displayValue(s, r, c);
   if (isSelected(r, c)) td.classList.add("selected");
   if (state.sel.r1 === r && state.sel.c1 === c) td.classList.add("active");
