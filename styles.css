@@ -146,6 +146,8 @@ table#grid { border-collapse: collapse; table-layout: fixed; }
   margin: -2px -6px;
   font: inherit;
   background: #fff;
+  resize: none;
+  overflow: hidden;
 }
 
 #statusbar {

@@ -26,7 +26,9 @@
     <div id="toolbar">
       <button id="btn-bold" title="Bold"><b>B</b></button>
       <label class="color-label">Text <input type="color" id="inp-color" value="#000000"></label>
+      <button id="btn-apply-color" title="Apply the chosen text color to the selection (works even when re-picking the same color)">Apply text</button>
       <label class="color-label">Fill <input type="color" id="inp-bg" value="#ffd666"></label>
+      <button id="btn-apply-bg" title="Apply the chosen fill color to the selection (works even when re-picking the same color)">Apply fill</button>
       <span class="sep"></span>
       <button id="btn-add-col" title="Insert column left of selection">+ Col</button>
       <button id="btn-del-col" title="Delete selected column">− Col</button>
@@ -49,7 +51,7 @@
     <div id="grid-wrap">
       <table id="grid" aria-label="Spreadsheet grid"></table>
     </div>
-    <div id="statusbar">Autosaves in this browser · Export JSON / CSV to move data between your devices · formulas: =A1+B2, =SUM(A1:B5), =AVG(), =MIN(), =MAX()</div>
+    <div id="statusbar">Autosaves in this browser · Export JSON / CSV to move data between your devices · formulas: =A1+B2, =SUM(A1:B5), =AVG(), =MIN(), =MAX() · drag a header edge to resize, double-click an edge to auto-fit · Alt+Enter for a line break in a cell</div>
     <div id="sheet-tabs"></div>
   </section>
 

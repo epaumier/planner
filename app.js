@@ -36,6 +36,19 @@ function key(r, c) { return r + "," + c; }
 
 function sheet() { return state.workbook.sheets[state.sheetIndex]; }
 
+const DEFAULT_COL_W = 120;
+const DEFAULT_ROW_H = 26;
+const MIN_COL_W = 40;
+const MAX_COL_W = 500;
+const MIN_ROW_H = 18;
+const MAX_ROW_H = 400;
+
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function colW(s, c) { return (s.colWidths && s.colWidths[c]) || DEFAULT_COL_W; }
+
+function rowH(s, r) { return (s.rowHeights && s.rowHeights[r]) || DEFAULT_ROW_H; }
+
 function cellAt(s, r, c) { return s.cells[key(r, c)] || null; }
 
 function getRaw(s, r, c) { const cell = cellAt(s, r, c); return cell ? cell.v : ""; }
@@ -291,6 +304,16 @@ function makeTh(text, cls) {
   return el;
 }
 
+function cellBg(s, r, c) {
+  const cell = cellAt(s, r, c);
+  if (cell && cell.bg) return cell.bg;
+  if (s.zebraPeriod) {
+    const p = r % s.zebraPeriod;
+    if (p >= 1 && p % 2 === 0) return s.zebraColor;
+  }
+  return null;
+}
+
 function renderCell(s, r, c) {
   const td = document.createElement("td");
   td.dataset.r = r;
@@ -299,8 +322,9 @@ function renderCell(s, r, c) {
   if (cell) {
     if (cell.b) td.style.fontWeight = "bold";
     if (cell.color) td.style.color = cell.color;
-    if (cell.bg) td.style.backgroundColor = cell.bg;
   }
+  const bg = cellBg(s, r, c);
+  if (bg) td.style.backgroundColor = bg;
   td.textContent = displayValue(s, r, c);
   if (isSelected(r, c)) td.classList.add("selected");
   if (state.sel.r1 === r && state.sel.c1 === c) td.classList.add("active");
@@ -316,6 +340,7 @@ function renderGrid() {
   for (let c = 0; c < s.cols; c++) {
     const thEl = makeTh(colName(c), "col-head");
     thEl.dataset.c = c;
+    thEl.style.width = colW(s, c) + "px";
     hr.appendChild(thEl);
   }
   thead.appendChild(hr);
@@ -323,6 +348,7 @@ function renderGrid() {
   const tbody = document.createElement("tbody");
   for (let r = 0; r < s.rows; r++) {
     const tr = document.createElement("tr");
+    tr.style.height = rowH(s, r) + "px";
     const rh = makeTh(String(r + 1), "row-head");
     rh.dataset.r = r;
     tr.appendChild(rh);
@@ -392,8 +418,9 @@ function startEdit(r, c) {
   const s = sheet();
   const td = gridEl.querySelector('td[data-r="' + r + '"][data-c="' + c + '"]');
   if (!td) return;
-  const input = document.createElement("input");
+  const input = document.createElement("textarea");
   input.className = "cell-editor";
+  input.rows = 1;
   input.value = getRaw(s, r, c);
   td.textContent = "";
   td.appendChild(input);
@@ -413,7 +440,7 @@ function startEdit(r, c) {
     else if (move === "left") moveSelTo(r, c - 1);
   };
   input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); finish(true, "down"); }
+    if (e.key === "Enter" && !e.altKey) { e.preventDefault(); e.stopPropagation(); finish(true, "down"); }
     else if (e.key === "Tab") { e.preventDefault(); e.stopPropagation(); finish(true, e.shiftKey ? "left" : "right"); }
     else if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); finish(false, null); }
   });
@@ -530,6 +557,8 @@ function importCSV(text) {
   const rows = parseCSV(text);
   const s = sheet();
   s.cells = {};
+  s.colWidths = {};
+  s.rowHeights = {};
   s.rows = Math.max(rows.length, 1);
   s.cols = Math.max.apply(Math, rows.map((r) => r.length).concat([1]));
   rows.forEach((row, r) => row.forEach((v, c) => { if (v !== "") setCell(s, r, c, { v }); }));
@@ -574,9 +603,92 @@ gridEl.addEventListener("click", (e) => {
 });
 
 gridEl.addEventListener("dblclick", (e) => {
+  const thEl = e.target.closest("th");
+  if (thEl && thEl.classList.contains("col-head") && edgeHit(thEl, e, "col")) { autoFitCol(Number(thEl.dataset.c)); return; }
+  if (thEl && thEl.classList.contains("row-head") && edgeHit(thEl, e, "row")) { autoFitRow(Number(thEl.dataset.r)); return; }
   const td = e.target.closest("td");
   if (td) startEdit(Number(td.dataset.r), Number(td.dataset.c));
 });
+
+function edgeHit(el, e, axis) {
+  const rect = el.getBoundingClientRect();
+  if (axis === "col") return e.clientX >= rect.right - 6 && e.clientX <= rect.right + 2;
+  return e.clientY >= rect.bottom - 6 && e.clientY <= rect.bottom + 2;
+}
+
+let drag = null;
+
+gridEl.addEventListener("mousedown", (e) => {
+  const thEl = e.target.closest("th");
+  if (!thEl) return;
+  if (thEl.classList.contains("col-head") && edgeHit(thEl, e, "col")) startDrag(e, "col", Number(thEl.dataset.c), thEl);
+  else if (thEl.classList.contains("row-head") && edgeHit(thEl, e, "row")) startDrag(e, "row", Number(thEl.dataset.r), thEl);
+});
+
+gridEl.addEventListener("mousemove", (e) => {
+  const thEl = e.target.closest("th");
+  if (!thEl || drag) return;
+  if (thEl.classList.contains("col-head")) thEl.style.cursor = edgeHit(thEl, e, "col") ? "col-resize" : "pointer";
+  else if (thEl.classList.contains("row-head")) thEl.style.cursor = edgeHit(thEl, e, "row") ? "row-resize" : "pointer";
+});
+
+function startDrag(e, type, index, el) {
+  e.preventDefault();
+  const s = sheet();
+  drag = {
+    type, index, el,
+    startX: e.clientX, startY: e.clientY,
+    startSize: type === "col" ? colW(s, index) : rowH(s, index),
+  };
+  document.addEventListener("mousemove", onDragMove);
+  document.addEventListener("mouseup", onDragEnd, { once: true });
+}
+
+function onDragMove(e) {
+  if (!drag) return;
+  const s = sheet();
+  if (drag.type === "col") {
+    const w = clamp(drag.startSize + (e.clientX - drag.startX), MIN_COL_W, MAX_COL_W);
+    (s.colWidths = s.colWidths || {})[drag.index] = Math.round(w);
+    drag.el.style.width = w + "px";
+  } else {
+    const h = clamp(drag.startSize + (e.clientY - drag.startY), MIN_ROW_H, MAX_ROW_H);
+    (s.rowHeights = s.rowHeights || {})[drag.index] = Math.round(h);
+    drag.el.closest("tr").style.height = h + "px";
+  }
+}
+
+function onDragEnd() {
+  document.removeEventListener("mousemove", onDragMove);
+  if (drag) { save(); render(); drag = null; }
+}
+
+function autoFitCol(c) {
+  const s = sheet();
+  let maxChars = 2;
+  for (let r = 0; r < s.rows; r++) {
+    const v = String(displayValue(s, r, c));
+    for (const line of v.split("\n")) maxChars = Math.max(maxChars, line.length);
+  }
+  (s.colWidths = s.colWidths || {})[c] = clamp(maxChars * 7 + 14, MIN_COL_W, MAX_COL_W);
+  save();
+  render();
+}
+
+function autoFitRow(r) {
+  const s = sheet();
+  let lines = 1;
+  for (let c = 0; c < s.cols; c++) {
+    const v = String(displayValue(s, r, c));
+    const perLine = Math.max(1, Math.floor((colW(s, c) - 12) / 7));
+    let n = 0;
+    for (const line of v.split("\n")) n += Math.max(1, Math.ceil(line.length / perLine));
+    lines = Math.max(lines, n);
+  }
+  (s.rowHeights = s.rowHeights || {})[r] = clamp(lines * 17 + 8, MIN_ROW_H, MAX_ROW_H);
+  save();
+  render();
+}
 
 document.addEventListener("keydown", (e) => {
   if (state.editing) return;
@@ -615,6 +727,8 @@ document.getElementById("btn-bold").addEventListener("click", () => {
 
 document.getElementById("inp-color").addEventListener("input", (e) => applyToSel({ color: e.target.value }));
 document.getElementById("inp-bg").addEventListener("input", (e) => applyToSel({ bg: e.target.value }));
+document.getElementById("btn-apply-color").addEventListener("click", () => applyToSel({ color: document.getElementById("inp-color").value }));
+document.getElementById("btn-apply-bg").addEventListener("click", () => applyToSel({ bg: document.getElementById("inp-bg").value }));
 
 document.getElementById("btn-add-row").addEventListener("click", () => { insertRow(sheet(), state.sel.r1); save(); render(); });
 document.getElementById("btn-del-row").addEventListener("click", () => { const s = sheet(); if (s.rows > 1) { deleteRow(s, state.sel.r1); save(); render(); } });

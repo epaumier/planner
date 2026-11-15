@@ -2,7 +2,7 @@ import calendar
 import json
 from datetime import date
 
-PERSONS = ["Membre 1", "Membre 2", "Membre 3", "Membre 4"]
+PERSONS = ["Tedd", "Mathilde", "Alistair", "Yoko"]
 MONTHS = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
           "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
 WEEKDAYS = ["L", "M", "Me", "J", "V", "S", "D"]
@@ -28,11 +28,11 @@ def year_sheet(year):
             if m > 12:
                 break
             c0 = MARGIN + j * BLOCK
-            put(top, c0, MONTHS[m - 1], b=True, bg="#e5e7eb")
+            put(top, c0, MONTHS[m - 1], b=True, bg="#fde047")
             for p, name in enumerate(PERSONS):
-                put(top, c0 + 2 + p, name, b=True, bg="#e5e7eb")
-            put(top, c0 + 6, "Événements", b=True, bg="#e5e7eb")
-            put(top, c0 + 7, "Info supp", b=True, bg="#e5e7eb")
+                put(top, c0 + 2 + p, name, b=True, bg="#fde047")
+            put(top, c0 + 6, "Événements", b=True, bg="#fde047")
+            put(top, c0 + 7, "Info supp", b=True, bg="#fde047")
             ndays = calendar.monthrange(year, m)[1]
             for d in range(1, 32):
                 r = top + d
@@ -44,6 +44,8 @@ def year_sheet(year):
         "rows": 6 * BAND,
         "cols": MARGIN + MONTHS_PER_BAND * BLOCK,
         "cells": cells,
+        "zebraColor": "#f8fafc",
+        "zebraPeriod": BAND,
     }
 
 
