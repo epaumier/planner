@@ -7,6 +7,8 @@ MONTHS = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
           "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
 WEEKDAYS = ["L", "M", "Me", "J", "V", "S", "D"]
 
+VERSION = 2  # must match SEED_VERSION in app.js
+
 BLOCK = 9    # day, weekday, 4 persons, events, info, spacer
 MARGIN = 1   # empty first column, like the original sheet
 BAND = 34    # header row + 31 day rows + 2 blank rows
@@ -49,7 +51,7 @@ def year_sheet(year):
     }
 
 
-workbook = {"sheets": [year_sheet(2026), year_sheet(2027)]}
+workbook = {"seedVersion": VERSION, "sheets": [year_sheet(2026), year_sheet(2027)]}
 
 with open("seed-calendar.js", "w", encoding="utf-8") as f:
     f.write("window.SEED_CALENDAR = ")

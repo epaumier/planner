@@ -1,6 +1,7 @@
 "use strict";
 
 const STORAGE_KEY = "planner.workbook.v1";
+const SEED_VERSION = 2;
 
 const state = {
   workbook: null,
@@ -111,7 +112,10 @@ function defaultWorkbook() {
 function load() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const wb = JSON.parse(raw);
+      if (wb && wb.seedVersion === SEED_VERSION) return wb;
+    }
   } catch (e) { /* corrupted storage falls through to default */ }
   return null;
 }
@@ -769,6 +773,7 @@ fileInput.addEventListener("change", () => {
         const wb = JSON.parse(text);
         if (!wb || !Array.isArray(wb.sheets) || wb.sheets.length === 0) throw new Error("bad workbook");
         state.workbook = wb;
+        wb.seedVersion = SEED_VERSION;
         state.sheetIndex = 0;
         state.sel = { r1: 0, c1: 0, r2: 0, c2: 0 };
         save();
@@ -796,7 +801,8 @@ document.getElementById("btn-export-json").addEventListener("click", () => {
 document.getElementById("btn-reset").addEventListener("click", () => {
   if (confirm("Replace the saved workbook in this browser with the demo data?")) {
     localStorage.removeItem(STORAGE_KEY);
-    state.workbook = defaultWorkbook();
+    state.workbook = window.SEED_CALENDAR || defaultWorkbook();
+    state.workbook.seedVersion = SEED_VERSION;
     state.sheetIndex = 0;
     state.sel = { r1: 0, c1: 0, r2: 0, c2: 0 };
     save();
@@ -816,4 +822,5 @@ document.querySelectorAll(".app-pill").forEach((btn) => {
 });
 
 state.workbook = load() || window.SEED_CALENDAR || defaultWorkbook();
+state.workbook.seedVersion = SEED_VERSION;
 render();

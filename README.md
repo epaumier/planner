@@ -15,6 +15,12 @@ alternate a slightly different background within each month block (zebra stripin
 stored as `zebraColor`/`zebraPeriod` on the sheet — an explicit cell fill always
 wins over the stripe). Regenerate the seed with `python3 tools/make_seed.py`.
 
+The seed is versioned: `VERSION` in `tools/make_seed.py` must match `SEED_VERSION`
+in `app.js`. When the default workbook changes, returning browsers automatically
+pick up the new seed (a cached localStorage copy from an older seed is ignored).
+Export JSON first if you want to keep local edits across an upgrade, or use
+**Reset demo** to force the current seed.
+
 ## Run it
 
 No build step, no dependencies. Either:
